@@ -1,0 +1,55 @@
+services:
+  uniclub06:
+    container_name: uniclub06
+    image: img-uniclub06
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_APPLICATION_NAME=uniclub06
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3307/uniclub
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=20MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=20MB
+      - JWTS_KEY=VU36KvCKCsOjaEcdygdXA8weNRGN7xAWrK77yCaNVos=
+      - ROOT_PATH=C:/Users/tan/Desktop/uploads
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6380
+    networks:
+      - local
+
+  redis06: # khởi tạo tên services, cài Container chứa CSDL
+    image: redis                    # lệnh này nó lên hubdocker nó search redis và nó tải về cho mình
+    # build: .                      # lệnh này nó lên hubdocker nó search redis và nó tải về cho mình
+    container_name: redis062        # đặt tên cho container của mình ⭐
+    # env_file: .env                # lấy các biến khai báo như PASS, TITLE bên file .env bằng cách $PASS, $TITLE
+    # environment:                    # biến môi trường của docker bên tab Inspect
+    #   - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - 6381:6379
+
+    # volumes:                        # ổ cứng lưu dữ liệu của docker
+    #   - mysql_db:/var/lib/mysql     # dường dẫn của docker
+    # networks:
+    #   - node-network                # lấy tên network phía dưới khai báo
+
+  redis-ui: # cài Container chứa BE ⭐
+    image: redis/redisinsight:latest
+    container_name: uiredis06       # tạo tên container ⭐
+    ports: # quy định port, ứng với port bên file "index.js => app.listen(8080) => port app.listen này là port phía bên trong đang chạy"
+      - 5541:5540
+
+  mysql062:
+    image: mysql
+    container_name: mysql06dc
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+
+
+networks:
+  local:
+    driver: bridge

@@ -1,0 +1,4 @@
+vn\io\ductandev\cucumberBDD\config\CucumberSpringConfiguration.class
+vn\io\ductandev\cucumberBDD\runner\CucumberTestRunner.class
+vn\io\ductandev\cucumberBDD\steps\RegisterStepsDefinition.class
+vn\io\ductandev\cucumberBDD\steps\LoginStepsDefinition.class

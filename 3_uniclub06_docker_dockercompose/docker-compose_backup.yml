@@ -1,0 +1,36 @@
+version: '3'
+# build image, khởi tạo container
+services:
+  mysql_db:                         # khởi tạo tên services, cài Container chứa CSDL
+    image: mysql                    # lệnh này nó lên hubdocker nó search mysql và nó tải về cho mình
+    # build: .                      # lệnh này nó lên hubdocker nó search mysql và nó tải về cho mình
+    container_name: mysql_db        # đặt tên cho container của mình ⭐
+    # env_file: .env                # lấy các biến khai báo như PASS, TITLE bên file .env bằng cách $PASS, $TITLE
+    environment:                    # biến môi trường của docker bên tab Inspect
+      - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - 3306:3306
+    volumes:                        # ổ cứng lưu dữ liệu của docker
+      - mysql_db:/var/lib/mysql     # dường dẫn của docker
+    networks:
+      - node-network                # lấy tên network phía dưới khai báo
+
+  node_be:                          # cài Container chứa BE ⭐
+    depends_on:                     # ưu tiên thằng nào được biuld trước (ở đây ưu tiên thằng mysql_db) => nhớ ghi thằng này để tránh lỗi vì có thể 2 thằng này chạy xong xong mà thằng trên chưa chạy xong thằng dưới đã kết nối với CSDL mà CSDL chưa chạy xong nên nó sẽ báo lỗi
+      - mysql_db
+    build: .                        # lệnh này tìm tới file "Dockerfile" để chạy
+    container_name: node_be         # tạo tên container ⭐
+    environment:                    # môi trường để kết nối với CSDL
+      - DATABASE_URL=mysql://root:1234@mysql_db:3306/db_food?schema=public      # mysql_db: nhớ đổi lại tên CSDL để kết nối để lấy CSDL
+    ports:                          # quy định port, ứng với port bên file "index.js => app.listen(8080) => port app.listen này là port phía bên trong đang chạy"
+      - 8080:8080
+    networks:
+      - node-network                # lấy tên network phía dưới khai báo
+
+volumes:                            # ổ cứng trong container
+  mysql_db:                         # lệnh đặt tên cho ổ cứng
+    driver: local
+networks:                           # lệnh này giúp gộp container (2,3,4 container...)
+  node-network:
+
+# $ docker-compose up -d            => tìm đến thư mục chứ docker-compose.yml
