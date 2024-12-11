@@ -1,9 +1,63 @@
 -- =======================================================
 -- 
 -- =======================================================
+select count(*) from patients
+where year(birth_date) = 2010
+
+
+-- =======================================================
+-- 
+-- =======================================================
+SELECT
+  patient_id,
+  first_name,
+  last_name
+FROM patients
+WHERE patient_id IN (
+    SELECT patient_id
+    FROM admissions
+    WHERE diagnosis = 'Dementia'
+  );
+
+-- =======================================================
+-- 
+-- =======================================================
+select first_name from patients
+order by len(first_name), first_name asc 
+
+-- =======================================================
+-- 
+-- =======================================================
+select
+	(select count(*) from patients where gender = 'M') as male,
+  (select count(*) from patients where gender = 'F') as female
+
+
+SELECT 
+  SUM(Gender = 'M') as male_count, 
+  SUM(Gender = 'F') AS female_count
+FROM patients
+
+select 
+  sum(case when gender = 'M' then 1 end) as male_count,
+  sum(case when gender = 'F' then 1 end) as female_count 
+from patients;
+
+-- =======================================================
+-- 
+-- =======================================================
 select city, count(*) as num_patients from patients
 group by city
 ORDER BY num_patients DESC, city asc;
+
+-- =======================================================
+-- 
+-- =======================================================
+select patient_id, diagnosis from admissions
+group by patient_id, diagnosis
+having count(diagnosis) > 1
+
+
 
 -- =======================================================
 -- Show first name, last name and role of every person that is either patient or doctor. The roles are either "Patient" or "Doctor"
@@ -226,26 +280,43 @@ from patients
 where admissions.patient_id is NULL
 
 
+-- =======================================================
+--    values starting with vowels (a, e, i, o, u)
+-- =======================================================
+SELECT product_name
+FROM products
+WHERE product_name LIKE 'a%'
+   OR product_name LIKE 'e%'
+   OR product_name LIKE 'i%'
+   OR product_name LIKE 'o%'
+   OR product_name LIKE 'u%';
+
+
+-- If you're using PostgreSQL, you can simplify this using a regular expression:
+SELECT product_name
+FROM products
+WHERE product_name ~* '^[aeiou]';
+
+
+
+-- =======================================================
+--    values starting with vowels both left and right (a, e, i, o, u)
+-- =======================================================
+select city from station
+where 
+    left (city,1) in ('a','e','i','o','u') and
+    right(city,1) in ('a','e','i','o','u')
+group by city;
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-- =======================================================
+--    delete every number 0 right side of all number
+-- =======================================================
+UPDATE employees
+SET number = RTRIM(number, '0');
 
 
 

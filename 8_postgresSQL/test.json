@@ -1,0 +1,172 @@
+{
+    "questionsSolved": [
+        {
+            "id": 0,
+            "userSolution": "select first_name, last_name, gender from patients\nwhere gender = 'M'"
+        },
+        {
+            "id": 1,
+            "userSolution": "select first_name, last_name from patients\nwhere allergies is null"
+        },
+        {
+            "id": 2,
+            "userSolution": "select first_name from patients\nwhere first_name like 'C%'"
+        },
+        {
+            "id": 3,
+            "userSolution": "select first_name, last_name from patients\nwhere weight between 100 and 120"
+        },
+        {
+            "id": 4,
+            "userSolution": "update patients\nset allergies = 'NKA'\nwhere allergies is null"
+        },
+        {
+            "id": 5,
+            "userSolution": "select concat(first_name, ' ', last_name) from patients"
+        },
+        {
+            "id": 6,
+            "userSolution": "select pa.first_name, pa.last_name, pn.province_name from patients pa\njoin province_names pn\non pa.province_id = pn.province_id"
+        },
+        {
+            "id": 23,
+            "userSolution": "select count(birth_date) from patients\nwhere year(birth_date) = 2010"
+        },
+        {
+            "id": 33,
+            "userSolution": "select first_name, last_name, max(height) from patients"
+        },
+        {
+            "id": 34,
+            "userSolution": "select * from patients\nwhere patient_id in (1,45,534,879,1000)"
+        },
+        {
+            "id": 35,
+            "userSolution": "select count(*) from admissions"
+        },
+        {
+            "id": 41,
+            "userSolution": "select * from admissions\nwhere admission_date = discharge_date"
+        },
+        {
+            "id": 42,
+            "userSolution": "select patient_id, count(*) from admissions\nwhere patient_id = 579"
+        },
+        {
+            "id": 32,
+            "userSolution": "select distinct(city) from patients\nwhere province_id = 'NS'"
+        },
+        {
+            "id": 45,
+            "userSolution": "select first_name, last_name, birth_date from patients\nwhere height > 160 and weight > 70"
+        },
+        {
+            "id": 46,
+            "userSolution": "select first_name, last_name, allergies from patients\nwhere allergies is not null and city = 'Hamilton'"
+        },
+        {
+            "id": 7,
+            "userSolution": "select year(birth_date) from patients\ngroup by year(birth_date);"
+        },
+        {
+            "id": 8,
+            "userSolution": "select first_name from patients\ngroup by first_name\nhaving count(first_name) = 1"
+        },
+        {
+            "id": 9,
+            "userSolution": "select patient_id, first_name from patients\nwhere first_name like 's____%s'"
+        },
+        {
+            "id": 10,
+            "userSolution": "select pa.patient_id, pa.first_name, pa.last_name from patients pa\njoin admissions ad\non pa.patient_id = ad.patient_id\nwhere diagnosis = 'Dementia'"
+        },
+        {
+            "id": 11,
+            "userSolution": "select first_name from patients\norder by len(first_name), first_name asc"
+        },
+        {
+            "id": 12,
+            "userSolution": "select \n\tsum (gender = 'M') as male,\n    Sum (gender = 'F') as female\n   from patients"
+        },
+        {
+            "id": 13,
+            "userSolution": "select first_name, last_name, allergies from patients\nwhere allergies in ('Penicillin', 'Morphine')\norder by allergies, first_name, last_name"
+        },
+        {
+            "id": 14,
+            "userSolution": "select patient_id, diagnosis from admissions\ngroup by patient_id, diagnosis\nhaving count(diagnosis) > 1"
+        },
+        {
+            "id": 15,
+            "userSolution": "select city, count(*) as total from patients\ngroup by city\norder by \n\ttotal desc,\n    city asc"
+        },
+        {
+            "id": 16,
+            "userSolution": "select first_name, last_name, 'Patient' as role from patients\nunion all\nselect first_name, last_name, 'Doctor' As role from doctors"
+        },
+        {
+            "id": 22,
+            "userSolution": "select allergies, count(*) as total from patients\nwhere allergies is not null\ngroup by allergies\norder by count(allergies) desc"
+        },
+        {
+            "id": 27,
+            "userSolution": "select first_name,last_name, birth_date from patients\nwhere year(birth_date) between 1970 and 1979\norder by birth_date asc"
+        },
+        {
+            "id": 28,
+            "userSolution": "select concat(upper(last_name), ',', lower(first_name)) as full_name from patients\norder by first_name desc"
+        },
+        {
+            "id": 30,
+            "userSolution": "select province_id, sum(height) as sum_hight from patients\ngroup by province_id\nhaving sum(height) >= 7000"
+        },
+        {
+            "id": 31,
+            "userSolution": "select  max(weight) - min(weight) from patients\nwhere last_name = 'Maroni'"
+        },
+        {
+            "id": 37,
+            "userSolution": "select Day(admission_date), count(*) total from admissions\ngroup by Day(admission_date)\norder by total desc"
+        },
+        {
+            "id": 38,
+            "userSolution": "select * from admissions\nwhere patient_id = 542\norder by admission_date desc\nlimit 1"
+        },
+        {
+            "id": 40,
+            "userSolution": "select patient_id, attending_doctor_id, diagnosis from admissions\nwhere \n\tpatient_id %2 != 0 and attending_doctor_id in (1,5,19)\n    or \n    attending_doctor_id like '%2%' and len(patient_id) = 3"
+        },
+        {
+            "id": 47,
+            "userSolution": "select d.first_name, d.last_name, count(*) as total_number from admissions a\njoin doctors d\non a.attending_doctor_id = d.doctor_id\ngroup by a.attending_doctor_id"
+        },
+        {
+            "id": 48,
+            "userSolution": "select d.doctor_id, concat(first_name, ' ', last_name) as full_name,\nmax (admission_date) as fisrt_date,\nmin (admission_date) as last_date\n\nfrom admissions a\njoin doctors d\non a.attending_doctor_id = d.doctor_id\ngroup by doctor_id"
+        },
+        {
+            "id": 50,
+            "userSolution": "select province_name, count(*) as total from patients pa\njoin province_names pr\non pa.province_id = pr.province_id\ngroup by province_name\norder by total desc"
+        },
+        {
+            "id": 51,
+            "userSolution": "select \n\tconcat(pa.first_name, ' ', pa.last_name) as full_name,\n    diagnosis,\n    concat(do.first_name, ' ', do.last_name) as doctor_fullname\n\nfrom patients pa\njoin admissions ad\non pa.patient_id = ad.patient_id\njoin doctors do\non do.doctor_id = ad.attending_doctor_id"
+        },
+        {
+            "id": 54,
+            "userSolution": "select first_name, last_name, count(*) as num_of_duplicate from patients\ngroup by first_name, last_name\nhaving count(*) > 1"
+        },
+        {
+            "id": 55,
+            "userSolution": "select concat(first_name, ' ', last_name) as full_name,\n\tround(height/ 30.48, 1) as height,\n    round(weight * 2.205, 0) as weight,\n    birth_date,\n    case\n    \twhen gender = 'M' then 'Male'\n        else 'Female'\n    end as gender\n from patients"
+        },
+        {
+            "id": 70,
+            "userSolution": "select pa.patient_id, pa.first_name, pa.last_name from patients pa\nfull outer join admissions ad\non pa.patient_id = ad.patient_id\nwhere pa.patient_id is null or ad.patient_id is null"
+        },
+        {
+            "id": 17,
+            "userSolution": "select \n\tcount(patient_id)  ,\n    weight - weight % 10 as weight_group\n    \n    from patients\ngroup by weight_group\norder by weight_group desc"
+        }
+    ]
+}
