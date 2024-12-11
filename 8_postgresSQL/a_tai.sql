@@ -88,7 +88,6 @@ LIMIT 1 OFFSET (:a - 1);
 -- ===============================================================================
 -- ⭐ BÀI 2: Viết câu Query tìm những name được lặp lại "n" lần liên tiếp
 -- Với data cho trước như sau và id không liên tiếp
--- Không sử dụng sql window functions
 -- tai
 -- tai
 -- tai
@@ -244,6 +243,135 @@ FROM final_group
 WHERE cnt >= :a -- Thay "n" mong muốn ở đây
 ORDER BY name;
 
+
+
+
+
+
+
+
+
+
+-- =======================================================
+--        Bài giải mẫu để hiểu và làm bài tập
+-- =======================================================
+CREATE TABLE Employees (
+    EmployeeID INT,
+    Name VARCHAR(50),
+    Department VARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+
+INSERT INTO Employees (EmployeeID, Name, Department, Salary) VALUES
+(1, 'Alice', 'HR', 5000),
+(2, 'Bob', 'IT', 7000),
+(3, 'Charlie', 'HR', 5500),
+(4, 'David', 'IT', 8000),
+(5, 'Eve', 'Finance', 6000);
+
+SELECT * FROM employees;
+
+SELECT 
+	EmployeeID,
+    Name,
+    Department,
+    Salary,
+ 	ROW_NUMBER() OVER (PARTITION BY Department ORDER BY Salary ASC) AS RowNum_1,
+ 	ROW_NUMBER() OVER (ORDER BY Department ASC) AS RowNum_2,
+	RANK() 		 OVER (ORDER BY Department ASC) AS Rank,
+	DENSE_RANK() OVER (ORDER BY Department ASC) AS DenseRank
+FROM Employees;
+
+
+
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+)
+SELECT
+  name,
+  ROW_NUMBER()  OVER (PARTITION BY name ORDER BY name) AS RowNum_partition,
+  ROW_NUMBER() 	OVER (ORDER BY name) AS row_number,
+  RANK() 		OVER (ORDER BY name) AS rank,
+  DENSE_RANK() 	OVER (ORDER BY name) AS dense_rank
+FROM tempp;
+
+
+
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+)
+SELECT name, RowNum_partition
+FROM (
+  SELECT name, ROW_NUMBER() OVER (PARTITION BY name ORDER BY name) AS RowNum_partition 
+  FROM tempp
+) subquery
+GROUP BY name, RowNum_partition
+HAVING RowNum_partition = :a;
+
+
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+)
+SELECT *, count(dense_rank) as appear
+FROM (
+	SELECT name, DENSE_RANK() OVER (ORDER BY name) AS dense_rank FROM tempp
+)
+group by name, DENSE_RANK
+HAVING count(dense_rank) >= :a;
 
 
 
