@@ -1,10 +1,11 @@
-CREATE TABLE Sales (
-    City NVARCHAR(50),
-    Region NVARCHAR(50),
+CREATE TABLE Sales1 (
+    id serial primary key,
+    City VARCHAR(50),
+    Region VARCHAR(50),
     SalesAmount DECIMAL(10, 2)
 );
 
-INSERT INTO Sales (City, Region, SalesAmount) VALUES
+INSERT INTO Sales1 (City, Region, SalesAmount) VALUES
 ('Hà Nội', 'Miền Bắc', 1000),
 ('Hải Phòng', 'Miền Bắc', 1500),
 ('Đà Nẵng', 'Miền Trung', 2000),
@@ -20,23 +21,41 @@ INSERT INTO Sales (City, Region, SalesAmount) VALUES
 -- OVER() là có thể giữ nguyên tất cả các hàng mà không cần gộp nhóm (grouping), hữu ích khi cần các phép tính tổng hợp nhưng vẫn giữ chi tiết
 -- PARTITION BY: Region chia nhóm dữ liệu theo từng vùng.
 -- ✅ CÁCH 1: DÙNG OVER() VÀ PARTITION
-SELECT 
+SELECT
+    id,
     City,
     Region,
     SalesAmount,
     SUM(SalesAmount) OVER (PARTITION BY Region) AS TotalSalesByRegion
-FROM Sales;
+FROM Sales1;
 
 
--- ✅ CÁCH 2: DÙNG GROUP BY
+-- ✅ CÁCH 2: DÙNG SUBQUERY
 SELECT
-    city,
-    region,
-    sales_amount,
-    SUM(sales_amount) AS TotalSalesByRegion
-from sales
-GROUP BY city,region, sales_amount
+    s.id,
+    s.city,
+    s.region,
+    s.SalesAmount,
+    (SELECT SUM(SalesAmount) 
+    FROM Sales1
+    WHERE region=s.region) AS TotalSalesByRegion
+from Sales1 s;
 
+
+-- ✅ CÁCH 3: DÙNG JOIN
+SELECT 
+	s.id,
+	s.city,
+	s.region,
+	s.salesAmount,
+	t.TotalSalesByRegion
+FROM Sales1 s
+JOIN (
+	SELECT region, SUM(SalesAmount) as TotalSalesByRegion
+	FROM Sales1
+	GROUP BY region
+) t ON s.region = t.region
+ORDER BY id;
 
 
 
@@ -218,8 +237,6 @@ FROM tempp;
 | tai    | 4                | 9          | 6    | 4          |
 | toai   | 1                | 10         | 10   | 5          |
 |------------------------------------------------------------|
-
-
 
 
 

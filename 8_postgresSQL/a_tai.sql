@@ -128,7 +128,7 @@ select * from tempp;
 
 
 
--- ✅ Cách 1:
+-- ✅ Cách 1: Không dùng windows function
 WITH tempp AS (
   SELECT 1 AS id, 'tai' AS name
   UNION ALL 
@@ -149,54 +149,15 @@ WITH tempp AS (
   SELECT 15 AS id, 'cuong' AS name
   UNION ALL 
   SELECT 16 AS id, 'toai' AS name
-),
-data_with_prev AS (
-  SELECT 
-    t1.id,
-    t1.name,
-    (
-      SELECT t2.name
-      FROM tempp t2
-      WHERE t2.id < t1.id
-      ORDER BY t2.id DESC
-      LIMIT 1
-    ) AS prev_name -- Tìm `name` của dòng trước đó (nếu có)
-  FROM tempp t1
-),
-grouped_data AS (
-  SELECT 
-    id,
-    name,
-    CASE 
-      WHEN name = prev_name THEN NULL -- Cùng nhóm nếu `name` giống dòng trước
-      ELSE id -- Bắt đầu nhóm mới khi `name` thay đổi
-    END AS group_start
-  FROM data_with_prev
-),
-filled_groups AS (
-  SELECT 
-    t1.id,
-    t1.name,
-    COALESCE(
-      (SELECT MAX(t2.group_start)
-       FROM grouped_data t2
-       WHERE t2.group_start IS NOT NULL AND t2.id <= t1.id),
-      t1.id
-    ) AS grp -- Gán nhóm cho mỗi dòng dựa trên `group_start` gần nhất
-  FROM grouped_data t1
-),
-final_group AS (
-  SELECT 
-    name,
-    grp,
-    COUNT(*) AS cnt
-  FROM filled_groups
-  GROUP BY name, grp
 )
-SELECT DISTINCT name
-FROM final_group
-WHERE cnt >= :a -- Thay `n` mong muốn tại đây
-ORDER BY name;
+SELECT
+  name,
+  count(name) as appear
+FROM tempp
+GROUP BY NAME
+HAVING COUNT(name) >= :a
+ORDER by name ASC;
+
 
 
 -- ✅ Cách 2: DÙNG SQL WINDOS FUNCTION
@@ -283,7 +244,7 @@ SELECT
 FROM Employees;
 
 
-
+-- ✅ TỔNG HỢP CÁCH DÙNG WINDOWS FUNCTION
 WITH tempp AS (
   SELECT 1 AS id, 'tai' AS name
   UNION ALL 
@@ -314,7 +275,7 @@ SELECT
 FROM tempp;
 
 
-
+-- ✅ CÁCH 1: DÙNG WINDOWS FUNCTION
 WITH tempp AS (
   SELECT 1 AS id, 'tai' AS name
   UNION ALL 
@@ -344,7 +305,7 @@ FROM (
 GROUP BY name, RowNum_partition
 HAVING RowNum_partition = :a;
 
-
+-- ✅ CÁCH 2: DÙNG WINDOWS FUNCTION
 WITH tempp AS (
   SELECT 1 AS id, 'tai' AS name
   UNION ALL 
@@ -371,7 +332,158 @@ FROM (
 	SELECT name, DENSE_RANK() OVER (ORDER BY name) AS dense_rank FROM tempp
 )
 group by name, DENSE_RANK
-HAVING count(dense_rank) >= :a;
+HAVING count(dense_rank) >= :a
+ORDER BY name;
+
+
+
+-- ✅ CÁCH 1: KHÔNG DÙNG WINDOWS FUNCTION
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+)
+SELECT
+  name,
+  count(name) as appear
+FROM tempp
+GROUP BY NAME
+HAVING COUNT(name) >= :a
+ORDER by name ASC;
+
+
+
+-- ✅ CÁCH 2: KHÔNG DÙNG WINDOWS FUNCTION
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+),
+RowNum_partition_table AS (
+	SELECT
+		t1.name as name,
+		(SELECT COUNT(*) FROM tempp t2 WHERE t2.name = t1.name AND t2.id <= t1.id) as RowNum_partition_col
+	from tempp t1
+	ORDER BY name ASC
+)
+SELECT
+  name,
+  RowNum_partition_col
+FROM RowNum_partition_table
+WHERE RowNum_partition_col = :a;
+
+
+
+-- ✅ CÁCH 3: KHÔNG DÙNG WINDOWS FUNCTION
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+),
+row_counts AS (
+  SELECT
+    name,
+    COUNT(name) AS row_number
+  FROM tempp
+  GROUP BY name
+)
+SELECT
+  name,
+  row_number
+FROM row_counts
+HAVING row_number >= :a
+ORDER BY name ASC;
+
+
+-- ✅ CÁCH 1: DÙNG OVER() VÀ PARTITION
+SELECT
+    id,
+    City,
+    Region,
+    SalesAmount,
+    SUM(SalesAmount) OVER (PARTITION BY Region) AS TotalSalesByRegion
+FROM Sales1
+ORDER BY id;
+
+-- ✅ CÁCH 2: DÙNG SUBQUERY
+SELECT
+    s.id,
+    s.city,
+    s.region,
+    s.salesAmount,
+    (SELECT SUM(SalesAmount) 
+    FROM Sales1
+    WHERE region=s.region) AS TotalSalesByRegion
+from Sales1 s;
+
+
+-- ✅ CÁCH 3: DÙNG JOIN
+SELECT 
+	s.id,
+	s.city,
+	s.region,
+	s.salesAmount,
+	t.TotalSalesByRegion
+FROM Sales1 s
+JOIN (
+	SELECT region, SUM(SalesAmount) as TotalSalesByRegion
+	FROM Sales1
+	GROUP BY region
+) t ON s.region = t.region
+ORDER BY id;
+
+
+
+
+
 
 
 
