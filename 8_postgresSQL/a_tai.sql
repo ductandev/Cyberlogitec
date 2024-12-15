@@ -183,7 +183,7 @@ WITH tempp AS (
   SELECT 16 AS id, 'toai' AS name
 ),
 group_with_seq AS (
-  SELECT 
+  SELECT
     id,
     name,
     -- Tăng nhóm khi giá trị `name` thay đổi so với hàng trước đó
@@ -484,8 +484,56 @@ ORDER BY id;
 
 
 
-
-
+-- ==========================================================
+--              ✅ CÁCH GIẢI ĐÚNG CỦA A TÀI
+-- ==========================================================
+WITH tempp AS (
+  SELECT 1 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 2 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 4 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 5 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 9 AS id, 'duy' AS name
+  UNION ALL 
+  SELECT 10 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 11 AS id, 'tai' AS name
+  UNION ALL 
+  SELECT 12 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 13 AS id, 'bao' AS name
+  UNION ALL 
+  SELECT 15 AS id, 'cuong' AS name
+  UNION ALL 
+  SELECT 16 AS id, 'toai' AS name
+  UNION ALL
+  SELECT 18 AS id, 'cuong' AS name
+  UNION ALL
+  SELECT 20 AS id, 'toai' AS name
+  UNION ALL
+  SELECT 22 AS id, 'cuong' AS name
+)
+,tempp2 as (
+select *,
+	(select count(*)
+	from tempp b
+	where b.name = a.name 
+	and b.id <= a.id
+	and not exists (
+		select *
+		from tempp c 
+		where c.id > b.id
+		and c.id < a.id
+		and c.name != b.name
+	)
+	)
+from tempp a
+) select distinct name 
+from tempp2 
+where count = :param;
 
 
 
