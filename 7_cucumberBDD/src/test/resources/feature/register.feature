@@ -1,6 +1,10 @@
 @regression @Register
 Feature: User Registration
 
+  As a new user
+  I want to fill out a sign-up form
+  So that I can register successfully and start using the application
+
   Background: The user is on the registration page
     Given the user is on the registration page
 

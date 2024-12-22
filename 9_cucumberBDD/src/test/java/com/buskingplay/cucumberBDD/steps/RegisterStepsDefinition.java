@@ -1,4 +1,4 @@
-package vn.io.ductandev.cucumberBDD.steps;
+package com.buskingplay.cucumberBDD.steps;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -44,7 +44,7 @@ public class RegisterStepsDefinition {
         driver.manage().window().maximize();
     }
 
-    @Given("the user is on the registration page")
+    @Given("the user is on the sign-up page")
     public void navigateToRegisterPage() {
         driver.get(REGISTER_URL);
         validateUrl(REGISTER_URL, ERROR_REGISTER_URL);
@@ -109,7 +109,6 @@ public class RegisterStepsDefinition {
     public void errorMessage(String message) {
         waitForTextToBePresent(By.xpath(String.format(XPATH_MESSAGE, message)), message);
     }
-
 
     @When("the user enters a password that does not meet complexity requirements")
     public void enterWeakPassword() {
